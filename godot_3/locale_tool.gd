@@ -6,7 +6,7 @@ class_name LocaleTool
 extends Node
 
 
-var config := preload("user://locale/locale_config.gd").new() ## 本地化配置
+var config := get_config("user://locale/locale_config.gd") ## 本地化配置
 var dump: TextDump ## 转储数据
 
 
@@ -15,7 +15,7 @@ func _ready() -> void:
   for font in config.fonts:
     font.font_data = config.font_data
 
-  if config.dump_mode:
+  if config.dump:
     # 进行转储
     dump = TextDump.new()
     TranslationServer.clear()
@@ -35,10 +35,10 @@ func _ready() -> void:
 
 func _notification(what: int) -> void:
   # 写入转储
-  if what == MainLoop.NOTIFICATION_WM_QUIT_REQUEST and dump:
+  if what == MainLoop.NOTIFICATION_WM_QUIT_REQUEST and config.dump:
     var file := File.new()
 
-    if file.open(config.dump_path, File.WRITE) != OK:
+    if file.open(config.dump_file, File.WRITE) != OK:
       print("无法写入转储文件")
       return
 
@@ -50,6 +50,14 @@ func _notification(what: int) -> void:
 
     print("已转储文本到 %s" % file.get_path_absolute())
     file.close()
+
+
+## 获取本地化配置
+func get_config(path: String) -> LocaleConfig:
+  if ResourceLoader.exists(path):
+    return load(path).new()
+  else:
+    return LocaleConfig.new()
 
 
 ## 返回路径 [param path] 中匹配表达式 [param expr] 的文件
@@ -73,6 +81,20 @@ func find_files(path: String, expr := "*") -> Array:
   dir.list_dir_end()
 
   return files
+
+
+## 本地化配置
+class LocaleConfig:
+
+
+  var locale := "" ## 本地化语言
+  var assets_path := "user://locale/" ## 资源路径
+
+  var fonts := [] ## 字体预设
+  var font_data := preload("C:/Windows/Fonts/simhei.ttf") ## 字体数据
+
+  var dump := false ## 是否进行转储
+  var dump_file := assets_path + "dump.pot" ## 转储文件
 
 
 ## 文本转储

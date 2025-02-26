@@ -30,8 +30,8 @@ var dump: TextDump ## 转储数据
 
 func _ready() -> void:
   # 批量替换字体
-  for font in config.fonts:
-    font.font_data = config.font_data
+  for preset in config.font_presets:
+    preset.font_data = config.font
 
   if config.dump:
     # 转储文本
@@ -43,7 +43,7 @@ func _ready() -> void:
     for file in find_files(config.assets_path, "*.po"):
       TranslationServer.add_translation(load(file))
 
-    # 设置本地化语言
+    # 设置本地化代码
     if config.locale:
       TranslationServer.set_locale(config.locale)
 
@@ -129,11 +129,11 @@ func generate_po(path: String, entries: Array, with_tr := false) -> void:
 class LocaleConfig:
 
 
-  var locale := "" ## 本地化语言
+  var locale := "" ## 本地化代码
   var assets_path := "user://locale/" ## 资源路径
 
-  var fonts := [] ## 字体预设
-  var font_data := preload("C:/Windows/Fonts/simhei.ttf") ## 字体数据
+  var font := preload("C:/Windows/Fonts/simhei.ttf") ## 本地化字体
+  var font_presets := [] ## 字体预设
 
   var dump := false ## 是否转储文本
   var dump_file := assets_path + "dump.pot" ## 转储文件

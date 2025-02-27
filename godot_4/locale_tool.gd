@@ -30,9 +30,9 @@ var dump: TextDump ## 转储数据
 
 func _ready() -> void:
   # 添加回退字体
-  var fonts := config.effective_fonts.duplicate()
+  var fonts := config.modify_fonts.duplicate()
 
-  for scene in config.effective_scenes:
+  for scene in config.modify_scenes:
     for variant in scene._bundled["variants"]:
       if variant is Font:
         fonts.append(variant)
@@ -129,8 +129,8 @@ class LocaleConfig:
   var assets_path := "user://locale/" ## 资源路径
 
   var font := SystemFont.new() ## 回退字体
-  var effective_fonts: Array[Font] ## 生效字体
-  var effective_scenes: Array[PackedScene] ## 生效场景
+  var modify_fonts: Array[Font] ## 需要修改的字体
+  var modify_scenes: Array[PackedScene] ## 需要修改字体的场景
 
   var dump := false ## 是否转储文本
   var dump_file := assets_path + "dump.pot" ## 转储文件

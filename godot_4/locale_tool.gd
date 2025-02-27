@@ -29,9 +29,16 @@ var dump: TextDump ## 转储数据
 
 
 func _ready() -> void:
-  # 批量添加回退字体
-  for preset in config.font_presets:
-    preset.fallbacks.append(config.font)
+  # 添加回退字体
+  var fonts := config.effective_fonts.duplicate()
+
+  for scene in config.effective_scenes:
+    for variant in scene._bundled["variants"]:
+      if variant is Font:
+        fonts.append(variant)
+
+  for font in fonts:
+    font.fallbacks.append(config.font)
 
   if config.dump:
     # 转储文本
@@ -121,8 +128,9 @@ class LocaleConfig:
   var locale := "" ## 本地化代码
   var assets_path := "user://locale/" ## 资源路径
 
-  var font := SystemFont.new() ## 本地化字体
-  var font_presets: Array[Font] ## 字体预设
+  var font := SystemFont.new() ## 回退字体
+  var effective_fonts: Array[Font] ## 生效字体
+  var effective_scenes: Array[PackedScene] ## 生效场景
 
   var dump := false ## 是否转储文本
   var dump_file := assets_path + "dump.pot" ## 转储文件

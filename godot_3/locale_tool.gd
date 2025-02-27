@@ -29,9 +29,16 @@ var dump: TextDump ## 转储数据
 
 
 func _ready() -> void:
-  # 批量替换字体
-  for preset in config.font_presets:
-    preset.font_data = config.font
+  # 添加回退字体
+  var fonts := config.effective_fonts.duplicate()
+
+  for scene in config.effective_scenes:
+    for variant in scene._bundled["variants"]:
+      if variant is DynamicFont:
+        fonts.append(variant)
+
+  for font in fonts:
+    font.add_fallback(config.font)
 
   if config.dump:
     # 转储文本
@@ -132,8 +139,9 @@ class LocaleConfig:
   var locale := "" ## 本地化代码
   var assets_path := "user://locale/" ## 资源路径
 
-  var font := preload("C:/Windows/Fonts/simhei.ttf") ## 本地化字体
-  var font_presets := [] ## 字体预设
+  var font := preload("C:/Windows/Fonts/simhei.ttf") ## 回退字体
+  var effective_fonts := [] ## 生效字体
+  var effective_scenes := [] ## 生效场景
 
   var dump := false ## 是否转储文本
   var dump_file := assets_path + "dump.pot" ## 转储文件
